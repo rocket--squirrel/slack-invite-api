@@ -1,9 +1,10 @@
-package main
+package routes
 
 import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/trickierstinky/slack-invite-api/debug"
 )
 
 func Router() *mux.Router {

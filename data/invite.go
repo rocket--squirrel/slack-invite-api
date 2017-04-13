@@ -1,4 +1,4 @@
-package main
+package data
 
 type Invite struct {
 	Name				string	`json:"name"`

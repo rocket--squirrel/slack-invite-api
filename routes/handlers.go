@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/trickierstinky/slack-invite-api/data"
 )
 
 func Index(w http.ResponseWriter, r *http.Request) {
@@ -17,7 +18,7 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 	var invite Invite
 
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-if err != nil {
+	if err != nil {
 		panic(err)
 	}
 	if err := r.Body.Close(); err != nil {

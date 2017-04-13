@@ -1,4 +1,4 @@
-package main
+package data
 
 // https://siongui.github.io/2016/01/09/go-sqlite-example-basic-usage/
 import (
