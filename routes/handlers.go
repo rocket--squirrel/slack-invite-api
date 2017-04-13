@@ -15,7 +15,7 @@ func Index(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostInvite(w http.ResponseWriter, r *http.Request) {
-	var invite Invite
+	var invite data.Invite
 
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -34,7 +34,7 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Insert Code to call Slack
-	i := RepoCreateInvite(invite)
+	i := data.RepoCreateInvite(invite)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
@@ -44,7 +44,7 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostIndex(w http.ResponseWriter, r *http.Request) {
-	var invite Invite
+	var invite data.Invite
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		panic(err)
@@ -62,7 +62,7 @@ func PostIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Insert Code to call Slack
-	i := RepoCreateInvite(invite)
+	i := data.RepoCreateInvite(invite)
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
