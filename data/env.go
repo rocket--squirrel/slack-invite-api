@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func fetch(item string) string {
+func Env(item string) string {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

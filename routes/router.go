@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	"github.com/trickierstinky/slack-invite-api/data"
 	"github.com/trickierstinky/slack-invite-api/logs"
 )
 
@@ -48,7 +49,7 @@ func BasicAuth(next http.HandlerFunc) http.HandlerFunc {
 		payload, _ := base64.StdEncoding.DecodeString(auth[1])
 		pair := strings.SplitN(string(payload), ":", 2)
 
-		if len(pair) != 2 || !validateUser(pair[0], pair[1]) {
+		if len(pair) != 2 || !data.ValidateUser(pair[0], pair[1]) {
 			http.Error(w, "authorization failed", http.StatusUnauthorized)
 			return
 		}
