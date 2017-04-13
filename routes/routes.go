@@ -18,7 +18,7 @@ var routes = Routes{
 		"GET",
 		"/",
 		Index,
-		true,
+		false,
 	},
 	Route{
 		"PostIndex",

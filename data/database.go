@@ -5,7 +5,7 @@ import (
 	"database/sql"
 )
 
-func Databse() {
+func Database() {
 	databaseFile := "./rs.db"
 	InitDB(databaseFile)
 }
