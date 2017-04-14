@@ -7,3 +7,13 @@ type Invite struct {
 }
 
 type Invites []Invite
+
+type InviteResponse struct {
+	Actions []InviteResponseAction
+}
+
+type InviteResponseAction struct {
+	Name  string `json:"name"`
+	Type  string `json:"type"`
+	Value string `json:"value"`
+}
