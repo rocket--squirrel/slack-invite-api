@@ -35,6 +35,7 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 	var message string
 	if strings.Split(inviteResponse.Actions[0].Value, ";")[0] == "yes" {
 		message = fmt.Sprintf("We've Invited %s", strings.Split(inviteResponse.Actions[0].Value, ";")[1])
+		services.SendSlackInviteRequest(strings.Split(inviteResponse.Actions[0].Value, ";")[1])
 	} else {
 		message = fmt.Sprintf("We've Not Invited %s", strings.Split(inviteResponse.Actions[0].Value, ";")[1])
 	}

@@ -7,8 +7,27 @@ import (
 	"github.com/trickierstinky/slack-invite-api/data"
 )
 
+//https://slack.com/oauth/authorize?
+//&client_id=CLIENTID
+//&team=TEAMID&install_redirect=oauth&scope=client
+
+func SendSlackInviteRequest(email string) bool {
+	api := slack.New(data.Env("slack_token"))
+	api.SetDebug(true)
+	fmt.Printf("%s (%s)\n", data.Env("slack_token"), data.Env("slack_team"))
+
+	err := api.InviteToTeam(data.Env("slack_team"), "test", "test", email)
+	if err != nil {
+		fmt.Printf("%s (%s)\n", err, email)
+		return false
+	}
+	return true
+}
+
 func PostSlackInviteRequest(invite data.Invite) {
 	api := slack.New(data.Env("slack_token"))
+	api.SetDebug(true)
+
 	params := slack.PostMessageParameters{}
 	attachment := slack.Attachment{
 		Text: fmt.Sprintf("We've had a new Invite Request from *%s* `%s` ```%s``` ", invite.Name, invite.Email, invite.Description),
