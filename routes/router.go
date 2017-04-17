@@ -13,9 +13,11 @@ import (
 func Router() *mux.Router {
 
 	router := mux.NewRouter().StrictSlash(true)
+
 	for _, route := range routes {
 		var handler http.Handler
 
+		handler = SecureJSONHeaders(route.HandlerFunc)
 		if route.Authenitcation {
 			handler = BasicAuth(route.HandlerFunc)
 		} else {
@@ -33,6 +35,16 @@ func Router() *mux.Router {
 	}
 
 	return router
+}
+
+func SecureJSONHeaders(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("X-XSS-Protection", "1;mode=blockFilter")
+		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add("X-Content-Type-Options", "nosniff")
+		w.Header().Add("X-Frame-Options", "DENY")
+		next(w, r)
+	}
 }
 
 func BasicAuth(next http.HandlerFunc) http.HandlerFunc {

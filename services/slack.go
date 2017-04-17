@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/nlopes/slack"
+	"github.com/trickierstinky/slack-invite-api/config"
 	"github.com/trickierstinky/slack-invite-api/data"
 )
 
@@ -12,11 +13,11 @@ import (
 //&team=TEAMID&install_redirect=oauth&scope=client
 
 func SendSlackInviteRequest(email string) bool {
-	api := slack.New(data.Env("slack_token"))
+	api := slack.New(config.Env("slack_token"))
 	api.SetDebug(true)
-	fmt.Printf("%s (%s)\n", data.Env("slack_token"), data.Env("slack_team"))
+	fmt.Printf("%s (%s)\n", config.Env("slack_token"), config.Env("slack_team"))
 
-	err := api.InviteToTeam(data.Env("slack_team"), "test", "test", email)
+	err := api.InviteToTeam(config.Env("slack_team"), "test", "test", email)
 	if err != nil {
 		fmt.Printf("%s (%s)\n", err, email)
 		return false
@@ -25,7 +26,7 @@ func SendSlackInviteRequest(email string) bool {
 }
 
 func PostSlackInviteRequest(invite data.Invite) {
-	api := slack.New(data.Env("slack_token"))
+	api := slack.New(config.Env("slack_token"))
 	api.SetDebug(true)
 
 	params := slack.PostMessageParameters{}
@@ -69,7 +70,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 
 	params.Attachments = []slack.Attachment{attachment}
 	// fmt.Println(params)
-	channelID, timestamp, err := api.PostMessage(data.Env("channel_id"), "New Invite Request", params)
+	channelID, timestamp, err := api.PostMessage(config.Env("channel_id"), "New Invite Request", params)
 	if err != nil {
 		fmt.Printf("%s (%s)\n", err, timestamp)
 		return
