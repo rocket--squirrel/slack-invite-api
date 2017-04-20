@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/nlopes/slack"
 	"github.com/trickierstinky/slack-invite-api/config"
@@ -44,7 +45,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 				Name:  "response",
 				Text:  "Approve",
 				Type:  "button",
-				Value: fmt.Sprintf("yes;%s", invite.Email),
+				Value: fmt.Sprintf("yes;%s", invite.ID),
 				Confirm: &slack.ConfirmationField{
 					Title:       "Are you sure?",
 					Text:        fmt.Sprintf("This will automatically, send out an email to %s inviting them to the group.", invite.Email),
@@ -56,7 +57,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 				Name:  "response",
 				Text:  "Reject",
 				Type:  "button",
-				Value: fmt.Sprintf("no;%s", invite.Email),
+				Value: fmt.Sprintf("no;%s", invite.ID),
 				Confirm: &slack.ConfirmationField{
 					Title:       "Are you sure?",
 					Text:        "This will reject the invite request",
@@ -69,7 +70,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 
 	params.Attachments = []slack.Attachment{attachment}
 	// fmt.Println(params)
-	channelID, timestamp, err := api.PostMessage(config.Env("channel_id"), "New Invite Request", params)
+	channelID, timestamp, err := api.PostMessage(config.Env("slack_channel_id"), "New Invite Request", params)
 	if err != nil {
 		fmt.Printf("%s (%s)\n", err, timestamp)
 		return

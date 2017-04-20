@@ -1,41 +1,57 @@
 package data
 
 // https://siongui.github.io/2016/01/09/go-sqlite-example-basic-usage/
+
 import (
-	"database/sql"
+	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	"github.com/trickierstinky/slack-invite-api/config"
 )
 
-func Database() {
-	databaseFile := "./rs.db"
-	InitDB(databaseFile)
+func SetupDatabase() {
+	db := openDatabase()
+	defer closeDatabase(db)
+	// Migrate the schema
+	db.AutoMigrate(&Invite{})
 }
 
-func InitDB(filepath string) *sql.DB {
-	db, err := sql.Open("sqlite3", filepath)
+func CreateInvite(invite Invite) Invite {
+	db := openDatabase()
+	defer closeDatabase(db)
+
+	db.Create(&invite)
+	return invite
+}
+
+func FetchInvite(id int) Invite {
+	db := openDatabase()
+	defer closeDatabase(db)
+
+	var invite Invite
+	db.Where("ID = ?", id).First(&invite)
+
+	return invite
+}
+
+func DeleteInvite(invite Invite) bool {
+	db := openDatabase()
+	defer closeDatabase(db)
+
+	db.Delete(&invite)
+
+	return true
+}
+
+func openDatabase() *gorm.DB {
+
+	db, err := gorm.Open(config.Env("db_provider"), config.Env("db_connection"))
+
 	if err != nil {
 		panic(err)
-	}
-	if db == nil {
-		panic("db nil")
 	}
 	return db
 }
 
-func CreateTables(db *sql.DB) {
-	// create tables if not exists
-	sql_table := `
-	CREATE TABLE IF NOT EXISTS invites(
-		Id TEXT NOT NULL PRIMARY KEY,
-		Name TEXT,
-		Email TEXT,
-		Description TEXT,
-		ProcessedDatetime DATETIME,
-		InsertedDatetime DATETIME
-	);
-	`
-
-	_, err := db.Exec(sql_table)
-	if err != nil {
-		panic(err)
-	}
+func closeDatabase(db *gorm.DB) {
+	db.Close()
 }

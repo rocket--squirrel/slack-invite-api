@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/trickierstinky/slack-invite-api/data"
@@ -33,14 +34,24 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 
 	var message string
-	if strings.Split(inviteResponse.Actions[0].Value, ";")[0] == "yes" {
-		message = fmt.Sprintf("We've Invited %s", strings.Split(inviteResponse.Actions[0].Value, ";")[1])
-		services.SendSlackInviteRequest(strings.Split(inviteResponse.Actions[0].Value, ";")[1])
+	response := strings.Split(inviteResponse.Actions[0].Value, ";")
+	invite_id, _ := strconv.Atoi(response[1])
+	invite := data.FetchInvite(invite_id)
+	if invite != (data.Invite{}) {
+		if response[0] == "yes" {
+			message = fmt.Sprintf("We've Invited %s", invite.Name)
+			services.SendSlackInviteRequest(invite.Email)
+		} else {
+			message = fmt.Sprintf("We've Not Invited %s", invite.Name)
+		}
+		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Thanks for the update, %s\"}", message)
+		fmt.Fprint(w, fullMessage)
+
+		data.DeleteInvite(invite)
 	} else {
-		message = fmt.Sprintf("We've Not Invited %s", strings.Split(inviteResponse.Actions[0].Value, ";")[1])
+		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Problem Updating\"}")
+		fmt.Fprint(w, fullMessage)
 	}
-	fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Thanks for the update, %s\"}", message)
-	fmt.Fprint(w, fullMessage)
 }
 
 func PostIndex(w http.ResponseWriter, r *http.Request) {
@@ -62,11 +73,13 @@ func PostIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//Insert Code to call Slack
-	i := data.RepoCreateInvite(invite)
+	invite = data.CreateInvite(invite)
+
 	services.PostSlackInviteRequest(invite)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(i); err != nil {
+
+	if err := json.NewEncoder(w).Encode(invite); err != nil {
 		panic(err)
 	}
 }

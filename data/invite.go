@@ -1,6 +1,11 @@
 package data
 
+import (
+	"github.com/jinzhu/gorm"
+)
+
 type Invite struct {
+	gorm.Model
 	Name        string `json:"name"`
 	Email       string `json:"email"`
 	Description string `json:"description"`
@@ -19,8 +24,3 @@ type InviteResponseAction struct {
 }
 
 var invites Invites
-
-func RepoCreateInvite(i Invite) Invite {
-	invites = append(invites, i)
-	return i
-}
