@@ -14,8 +14,7 @@ import (
 
 func SendSlackInviteRequest(email string) bool {
 	api := slack.New(config.Env("slack_token"))
-	api.SetDebug(true)
-	fmt.Printf("%s (%s)\n", config.Env("slack_token"), config.Env("slack_team"))
+	api.SetDebug(false)
 
 	err := api.InviteToTeam(config.Env("slack_team"), "test", "test", email)
 	if err != nil {
@@ -27,7 +26,7 @@ func SendSlackInviteRequest(email string) bool {
 
 func PostSlackInviteRequest(invite data.Invite) {
 	api := slack.New(config.Env("slack_token"))
-	api.SetDebug(true)
+	api.SetDebug(false)
 
 	params := slack.PostMessageParameters{}
 	attachment := slack.Attachment{
@@ -75,5 +74,5 @@ func PostSlackInviteRequest(invite data.Invite) {
 		fmt.Printf("%s (%s)\n", err, timestamp)
 		return
 	}
-	fmt.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
+	log.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
 }
