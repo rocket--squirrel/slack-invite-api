@@ -34,9 +34,11 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 
 	var message string
+
 	response := strings.Split(inviteResponse.Actions[0].Value, ";")
 	invite_id, _ := strconv.Atoi(response[1])
 	invite := data.FetchInvite(invite_id)
+
 	if invite != (data.Invite{}) {
 		if response[0] == "yes" {
 			message = fmt.Sprintf("We've Invited %s", invite.Name)
@@ -44,22 +46,28 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 		} else {
 			message = fmt.Sprintf("We've Not Invited %s", invite.Name)
 		}
-		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Thanks for the update, %s\"}", message)
-		fmt.Fprint(w, fullMessage)
 
+		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Thanks for the update, %s\"}", message)
+
+		fmt.Fprint(w, fullMessage)
 		data.DeleteInvite(invite)
+
 	} else {
 		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Problem Updating\"}")
+
 		fmt.Fprint(w, fullMessage)
 	}
 }
 
 func PostIndex(w http.ResponseWriter, r *http.Request) {
 	var invite data.Invite
+
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
+
 	if err != nil {
 		panic(err)
 	}
+
 	if err := r.Body.Close(); err != nil {
 		panic(err)
 	}
@@ -67,6 +75,7 @@ func PostIndex(w http.ResponseWriter, r *http.Request) {
 	if err := json.Unmarshal(body, &invite); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
+
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			panic(err)
 		}

@@ -4,7 +4,9 @@ import (
 	"encoding/base64"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/didip/tollbooth"
 	"github.com/gorilla/mux"
 	"github.com/trickierstinky/slack-invite-api/data"
 	"github.com/trickierstinky/slack-invite-api/logs"
@@ -16,13 +18,17 @@ func Router() *mux.Router {
 
 	for _, route := range routes {
 		var handler http.Handler
+		var handlerFunc http.HandlerFunc
 
-		handler = SecureJSONHeaders(route.HandlerFunc)
 		if route.Authenitcation {
-			handler = BasicAuth(route.HandlerFunc)
+			handlerFunc = BasicAuth(route.HandlerFunc)
 		} else {
-			handler = route.HandlerFunc
+			handlerFunc = route.HandlerFunc
 		}
+
+		handlerFunc = SecureJSONHeaders(handlerFunc)
+
+		handler = tollbooth.LimitFuncHandler(tollbooth.NewLimiter(1, time.Second), handlerFunc)
 
 		handler = logs.Logger(handler, route.Name)
 
@@ -43,6 +49,7 @@ func SecureJSONHeaders(next http.HandlerFunc) http.HandlerFunc {
 		w.Header().Add("Content-Type", "application/json")
 		w.Header().Add("X-Content-Type-Options", "nosniff")
 		w.Header().Add("X-Frame-Options", "DENY")
+
 		next(w, r)
 	}
 }

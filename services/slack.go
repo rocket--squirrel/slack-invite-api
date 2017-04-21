@@ -45,7 +45,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 				Name:  "response",
 				Text:  "Approve",
 				Type:  "button",
-				Value: fmt.Sprintf("yes;%s", invite.ID),
+				Value: fmt.Sprintf("yes;%d", int(invite.ID)),
 				Confirm: &slack.ConfirmationField{
 					Title:       "Are you sure?",
 					Text:        fmt.Sprintf("This will automatically, send out an email to %s inviting them to the group.", invite.Email),
@@ -57,7 +57,7 @@ func PostSlackInviteRequest(invite data.Invite) {
 				Name:  "response",
 				Text:  "Reject",
 				Type:  "button",
-				Value: fmt.Sprintf("no;%s", invite.ID),
+				Value: fmt.Sprintf("no;%d", int(invite.ID)),
 				Confirm: &slack.ConfirmationField{
 					Title:       "Are you sure?",
 					Text:        "This will reject the invite request",
