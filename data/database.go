@@ -37,7 +37,7 @@ func DeleteInvite(invite Invite) bool {
 	db := openDatabase()
 	defer closeDatabase(db)
 
-	db.Set("gorm:delete_option", "OPTION (OPTIMIZE FOR UNKNOWN)").Delete(&invite)
+	db.Unscoped().Delete(&invite)
 
 	return true
 }
