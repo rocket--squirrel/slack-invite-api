@@ -41,10 +41,14 @@ func PostInvite(w http.ResponseWriter, r *http.Request) {
 
 	if invite != (data.Invite{}) {
 		if response[0] == "yes" {
-			message = fmt.Sprintf("We've Invited %s", invite.Name)
-			services.SendSlackInviteRequest(invite.Email)
+
+			if err := services.SendSlackInviteRequest(invite.Email, invite.Name); err != nil {
+				message = fmt.Sprintf("Problem Updating - Manual Invite needed - *%s* `%s` ```%s```", invite.Name, invite.Email, invite.Description)
+			} else {
+				message = fmt.Sprintf("We've Invited *%s* `%s` ```%s``` ", invite.Name, invite.Email, invite.Description)
+			}
 		} else {
-			message = fmt.Sprintf("We've Not Invited %s", invite.Name)
+			message = fmt.Sprintf("We've Not Invited *%s* `%s` ```%s``` ", invite.Name, invite.Email, invite.Description)
 		}
 
 		fullMessage := fmt.Sprintf("{\"replace_original\": true,\"text\": \"Thanks for the update, %s\"}", message)

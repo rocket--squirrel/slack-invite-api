@@ -3,26 +3,35 @@ package services
 import (
 	"fmt"
 	"log"
+	"net/http"
+	"net/url"
 
 	"github.com/nlopes/slack"
 	"github.com/trickierstinky/slack-invite-api/config"
 	"github.com/trickierstinky/slack-invite-api/data"
 )
 
-//https://slack.com/oauth/authorize?
-//&client_id=CLIENTID
-//&team=TEAMID&install_redirect=oauth&scope=client
+//https://api.slack.com/custom-integrations/legacy-tokens
 
-func SendSlackInviteRequest(email string) bool {
-	api := slack.New(config.Env("slack_token"))
-	api.SetDebug(false)
+func SendSlackInviteRequest(email string, name string) error {
 
-	err := api.InviteToTeam(config.Env("slack_team"), "test", "test", email)
+	var Url *url.URL
+	Url, err := url.Parse("https://slack.com")
 	if err != nil {
-		fmt.Printf("%s (%s)\n", err, email)
-		return false
+		panic("boom")
 	}
-	return true
+
+	Url.Path += "/api/users.admin.invite"
+	parameters := url.Values{}
+	parameters.Add("token", config.Env("slack_invite_token"))
+	parameters.Add("email", email)
+	Url.RawQuery = parameters.Encode()
+
+	_, err2 := http.Get(Url.String())
+	if err2 != nil {
+		fmt.Printf("%s (%s)\n", err2, email)
+	}
+	return err2
 }
 
 func PostSlackInviteRequest(invite data.Invite) {
